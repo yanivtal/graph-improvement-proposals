@@ -374,7 +374,26 @@ An op represents a single atomic operation that produces or modifies knowledge. 
 message Op {
   OpType type = 1;
   Triple triple = 2;
-  repeated Triple triples = 3;
+  Entity entity = 3;
+  Relation relation = 4;
+  repeated Triple triples = 5;
+}
+```
+
+```proto
+message Relation {
+  string id = 1;
+  string type = 2;
+  string fromEntity = 3;
+  string toEntity = 4;
+  string index = 5;
+}
+```
+
+```proto
+message Entity {
+  string id = 1;
+  repeated string types 2;
 }
 ```
 
@@ -383,7 +402,9 @@ message Op {
 | Set triple             | 1     |
 | Delete triple          | 2     |
 | Set triple batch       | 3     |
-| Delete triple batch    | 4     |
+| Delete entity          | 4     |
+| Create relation        | 5     |
+| Delete relation        | 6     |
 
 
 
@@ -392,7 +413,9 @@ enum OpType {
   SET_TRIPLE = 1;
   DELETE_TRIPLE = 2;
   SET_TRIPLE_BATCH = 3;
-  DELETE_TRIPLE_BATCH = 4;
+  DELETE_ENTITY = 4;
+  CREATE_RELATION = 5;
+  DELETE_RELATION = 6;
 }
 ```
 
@@ -415,13 +438,22 @@ When the OpType is `Delete triple`, just the EA fields of the triple should be i
 | Entity          | 1     | The entity ID to delete the triple for    |
 | Attribute       | 2     | The attribute ID to delete the triple for |
 
+
 #### 13.3 Set triple batch
 
-When the OpType is `Set triple batch`, all 3 EAV fields of each of the triples must be included. Set triples batch is used in order to set multiple triples for the same entity or relation in a single database transaction. For relations, `From entity`, `To entity`, `Type`, `Relation type` and `Index` must all be included in a single triple batch.
+Set triples batch is used in order to set multiple triples for the same entity in a single database transaction. When the OpType is `Set triple batch`, the triples field must be included with the 3 EAV fields of each of the triples required.
 
-#### 13.4 Delete triple batch
+#### 13.4 Delete entity
 
-When the OpType is `Delete triple batch`, just the EA fields of each triple should be included. For relations, all required triples should be deleted in a single triple batch.
+When the OpType is `Delete entity`, just the entity field should be included with the entity ID. Indexers should delete all properties for deleted entities.
+
+#### 13.5 Create relation
+
+When creating a relation, the `Create relation` op type should be used instead of `Set triple batch` or `Set triple`. The relation field must be included with `ID`, `Type`, `From entity`, `To entity` and `Index` all required.
+
+#### 13.6 Delete relation
+
+When the OpType is `Delete relation`, just the relation field should be included with the entity ID. Indexers should delete all properties for deleted relations.
 
 ### 14. Edits
 
