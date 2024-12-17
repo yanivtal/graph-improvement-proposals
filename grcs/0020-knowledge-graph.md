@@ -374,6 +374,7 @@ An op represents a single atomic operation that produces or modifies knowledge. 
 message Op {
   OpType type = 1;
   Triple triple = 2;
+  repeated Triple triples = 3;
 }
 ```
 
@@ -381,11 +382,17 @@ message Op {
 | ---------------------- |-------|
 | Set triple             | 1     |
 | Delete triple          | 2     |
+| Set triple batch       | 3     |
+| Delete triple batch    | 4     |
+
+
 
 ```proto
 enum OpType {
   SET_TRIPLE = 1;
   DELETE_TRIPLE = 2;
+  SET_TRIPLE_BATCH = 3;
+  DELETE_TRIPLE_BATCH = 4;
 }
 ```
 
@@ -407,6 +414,14 @@ When the OpType is `Delete triple`, just the EA fields of the triple should be i
 | --------------- |-------| ----------------------------------------- |
 | Entity          | 1     | The entity ID to delete the triple for    |
 | Attribute       | 2     | The attribute ID to delete the triple for |
+
+#### 13.3 Set triple batch
+
+When the OpType is `Set triple batch`, all 3 EAV fields of each of the triples must be included. Set triples batch is used in order to set multiple triples for the same entity or relation in a single database transaction. For relations, `From entity`, `To entity`, `Type`, `Relation type` and `Index` must all be included in a single triple batch.
+
+#### 13.4 Delete triple batch
+
+When the OpType is `Delete triple batch`, just the EA fields of each triple should be included. For relations, all required triples should be deleted in a single triple batch.
 
 ### 14. Edits
 
