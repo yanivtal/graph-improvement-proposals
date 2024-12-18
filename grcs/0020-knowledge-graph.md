@@ -393,7 +393,7 @@ message Relation {
 ```proto
 message Entity {
   string id = 1;
-  repeated string types 2;
+  repeated string types = 2;
 }
 ```
 
