@@ -384,8 +384,8 @@ message Op {
 message Relation {
   string id = 1;
   string type = 2;
-  string fromEntity = 3;
-  string toEntity = 4;
+  string from_entity = 3;
+  string to_entity = 4;
   string index = 5;
 }
 ```
@@ -514,8 +514,8 @@ Spaces are abstracted from the underlying infrastructure. A space contract can b
 message Import {
   string version = 1;
   ActionType type = 2;
-  string previousNetwork = 3;
-  string previousContractAddress = 4;
+  string previous_network = 3;
+  string previous_contract_address = 4;
   repeated string edits = 5;
 }
 ```
@@ -526,8 +526,8 @@ message Import {
 {
   "version": "1.0.0",
   "type": "import",
-  "previousNetwork": "7UiGr3qnjZfRuKs3F3CX61",
-  "previousContract": "0x1A39E2Fe299Ef8f855ce43abF7AC85D6e69E05F5",
+  "previous_network": "7UiGr3qnjZfRuKs3F3CX61",
+  "previous_contract_address": "0x1A39E2Fe299Ef8f855ce43abF7AC85D6e69E05F5",
   "edits": [
     "ipfs://QmVGF2e9WqF8g39W81eCQxecz7Bdi5o2DFSJ5BQxwfveYB"
   ]
