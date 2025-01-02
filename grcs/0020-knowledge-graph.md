@@ -32,7 +32,7 @@ Data is encoded using Protobufs. Protocol Buffers are a language-neutral, platfo
 
 ### 2. IDs
 
-All IDs must be globally unique and 22 characters using Base58 encoding. They should be created using the UUID4 standard and stripping out the dashes (bringing the length from 36 bytes to 32 bytes) and then Base58 encoding. If an entity is coming from a system that already has globally unique IDs of arbitrary length, they can be deterministically converted into valid globally unique 22 character IDs by taking an md5 hash of the string, seeding that into a UUID4 generator, stripping the dashes and Base58 encoding. IDs must be randomly generated and not be altered to contain any identifiable strings in order to prevent collisions.
+All IDs must be globally unique and 22 characters using Base58 encoding. They should be created using the UUID4 standard and stripping out the dashes (bringing the length from 36 bytes to 32 bytes) and then Base58 encoding. The Bitcoin alphabet should be use for Base58 encoding, consisting of the following characters: `123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz`. If an entity is coming from a system that already has globally unique IDs of arbitrary length, they can be deterministically converted into valid globally unique 22 character IDs by taking an md5 hash of the string, seeding that into a UUID4 generator, stripping the dashes and Base58 encoding. If the resulting ID is less than 22 characters, it should be zero-padded on the right to bring the length to 22 characters. IDs must be randomly generated and not be altered to contain any identifiable strings in order to prevent collisions.
 
 Example ID: `Gw9uTVTnJdhtczyuzBkL3X`
 
