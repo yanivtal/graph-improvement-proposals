@@ -269,7 +269,7 @@ From entity, To entity and Index are required.
 
 #### 8.1 Relation Types
 
-A Relation Type is a definition of a relation similar to an attribute but specifically for one to one, one to many, and many to many relations. A Relation Type can have a name like `Team member`, `City` or a more graph style name like `Born in`. The relevent Relation Types are added as types along with the `Relation` type to a relation. Adding Relation Types to Relations is optional but strongly encouraged. An individual relation cannot have more than one Relation Type.
+A Relation Type is a definition of a relation similar to an attribute but specifically for one to one, one to many, and many to many relations. A Relation Type can have a name like `Team member`, `City` or a more graph style name like `Born in`. A relation must have exactly one Relation Type.
 
 | Name          | Type      | ID                     |
 | ------------- |-----------|----------------------- |
@@ -384,8 +384,8 @@ message Op {
 message Relation {
   string id = 1;
   string type = 2;
-  string fromEntity = 3;
-  string toEntity = 4;
+  string from_entity = 3;
+  string to_entity = 4;
   string index = 5;
 }
 ```
@@ -421,7 +421,7 @@ enum OpType {
 
 #### 13.1 Set triple
 
-When the OpType is `Set triple`, all 3 EAV fields of the triple must be included.
+When the OpType is `Set triple`, all 3 EAV fields of the triple field must be included.
 
 | Name            | Value | Description                                        |
 | --------------- |-------| -------------------------------------------------- |
@@ -431,7 +431,7 @@ When the OpType is `Set triple`, all 3 EAV fields of the triple must be included
 
 #### 13.2 Delete triple
 
-When the OpType is `Delete triple`, just the EA fields of the triple should be included.
+When the OpType is `Delete triple`, just the EA fields of the triple field should be included.
 
 | Name            | Value | Description                               |
 | --------------- |-------| ----------------------------------------- |
@@ -441,11 +441,11 @@ When the OpType is `Delete triple`, just the EA fields of the triple should be i
 
 #### 13.3 Set triple batch
 
-Set triples batch is used in order to set multiple triples for the same entity in a single database transaction. When the OpType is `Set triple batch`, the triples field must be included with the 3 EAV fields of each of the triples required.
+Set triple batch is used in order to set multiple triples for the same entity in a single database transaction. When the OpType is `Set triple batch`, the triples field must be included with the 3 EAV fields of each of the triples required.
 
 #### 13.4 Delete entity
 
-When the OpType is `Delete entity`, just the entity field should be included with the entity ID. Indexers should delete all properties for deleted entities.
+When the OpType is `Delete entity`, just the entity field should be included with the entity ID. Indexers should delete all properties for deleted entities in the space.
 
 #### 13.5 Create relation
 
