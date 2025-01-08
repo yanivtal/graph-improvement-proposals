@@ -205,7 +205,7 @@ Types may have zero, one or many attributes and relation types defined on them.
 
 | Name           | Type                      | ID                     |
 | -------------- |---------------------------|----------------------- |
-| Attributes     | Relation \<Attribute>     | 9zBADaYzyfzyFJn4GU1cC  |
+| Attributes     | Relation \<Attribute>     | 9zBADaYzyfzyFJn4GU1cC0 |
 | Relation Types | Relation \<Relation Type> | TarUQath6Kyh3jfnRv3hy7 |
 
 ### 7. Attributes
