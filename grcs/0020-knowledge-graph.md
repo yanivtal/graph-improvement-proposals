@@ -199,7 +199,7 @@ Every entity has an implicit Types relation and can have zero, one or many types
 
 | Name      | Type | ID                     |
 | --------- |------|----------------------- |
-| Type      | Type | Jfmby78N4BCseZinBmdVov |
+| Type      | Type | VdTsW1mGiy1XSooJaBBLc4 |
 
 Types may have zero, one or many attributes and relation types defined on them.
 
