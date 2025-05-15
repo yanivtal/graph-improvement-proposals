@@ -32,9 +32,9 @@ Data is encoded using Protobufs. Protocol Buffers are a language-neutral, platfo
 
 ### 2. IDs
 
-All IDs must be globally unique UUIDs. They should be created using the UUID4 standard and byte encoded over the wire. When string encoding in clients, the UUIDs should have their dashes stripped out. If an entity is coming from a system that already has globally unique IDs of arbitrary length, they can be deterministically converted into valid ID by taking an md5 hash of the string, seeding that into a UUID4 generator, and stripping the dashes.
+All IDs must be globally unique UUIDs. They should be created using the UUID4 standard and byte encoded over the wire. When string encoding in clients, the UUIDs should have their dashes stripped out. If an entity is coming from a system that already has guaranteed globally unique IDs of arbitrary length, they can be deterministically converted into valid ID by taking an md5 hash of the string, seeding that into a UUID4 generator.
 
-Example ID: `82ed11dfc61c416293d90fa24233463f`
+Example ID: `2a5fe010-078b-4ad6-8a61-7272f33729f4`
 
 ### 3. Spaces
 
@@ -96,23 +96,9 @@ message Options {
 ```
 
 
-// Probably not worth it just for the savings on bool
-// Maybe the only reason to add this is if we want to add bytes
-message ScalarValue {
-  oneof val {
-    string text             = 1;
-    double number           = 2;
-    bool checkbox           = 3;
-    string url              = 4;
-    string time_iso8601     = 5;
-    PointValue point        = 6;
-  }
-}
-
-
 ### 7. Properties
 
-Entities have properties which are themselves defined as entities. A property describes an attribute or a field of an entity. For example, a property might describe a Name, Description, Birthday or any other attribute of the entity. The property may or may not be included as a property on one of the entity's types. When Property entities are created, a relation to the value's type must be included in the same edit. That Value Type cannot change in future edits. If it's desired to change the type of a Property, a new Property should be created with the new type.
+Entities have properties which are themselves defined as entities. A property describes an attribute or a field of an entity. For example, a property might describe a Name, Description, Birthday or any other attribute of the entity. The property may or may not be included as a property on one of the entity's types. If a value type is not included when creating a property, it defaults to being a Text property.
 
 | Name            | Type | ID                     |
 | --------------- |------|----------------------- |
@@ -122,18 +108,20 @@ The Property type has the following attributes:
 
 | Name           | Type            | Description                                                          |
 | -------------- |-----------------| -------------------------------------------------------------------- |
-| Value Type     | Relation\<Type> | The entity ID for the type a value should have.                      |
-| Unit           | Relation\<Unit> | An optional unit                                                     |
-| Format         | Text            | An optional format string                                            |
+| Value type     | Relation\<Type> | The entity ID for the type a value should have.                      |
+| Relation value types | Relation\<Type> | When the property is for a relation, hints for the possible types on the relation entity |
+| Unit           | Relation\<Unit> | An optional unit                                                                               |
+| Format         | Text            | An optional format string                                                                      |
 
 
 Attributes are used for native types like Text, Number and Time. The Value Types should reference the entity IDs created for the native types.
 
-| Name        | ID                     |
-| ------------| ---------------------- |
-| Value Type  | 9fc412d5-d53c-45c9-9e1f-2eee32b971f8 |
-| Unit        | 386d9dde-4c10-4099-af42-0e946bf2f199 |
-| Format      | c5d181a2-6593-4c2c-b0da-8396bab2d8fb |
+| Name                  | ID                                   |
+| ----------------------| ------------------------------------ |
+| Value type            | 9fc412d5-d53c-45c9-9e1f-2eee32b971f8 |
+| Relation value types  | 33f2784f-4743-4c70-821a-cfd49adb8aee |
+| Unit                  | 386d9dde-4c10-4099-af42-0e946bf2f199 |
+| Format                | c5d181a2-6593-4c2c-b0da-8396bab2d8fb |
 
 
 There are 6 native value types. A princple used for naming the native types is to prioritize accessibility and familiarity for non-developers. There will be many different types of applications producing and consuming knowledge and the more consistent, familiar and accessible producing and consuming raw knowledge is, the more people will be able to participate in the knowledge economy.
@@ -148,7 +136,13 @@ There are 6 native value types. A princple used for naming the native types is t
 | Point        | bc76a151-fa46-4a9a-9590-c40e1738f452 | For geo locations or other coordinates                    |
 
 
-In addition, properties can have Value Type: Relation, which isn't a native type, but the allows us to define relation types as part of the schema. For each native value type, if a value is provided that is invalid, the triple should be dropped and treated as unset. Null cannot be provided as a value. Each native value type is UTF-8 encoded as a string.
+In addition, properties can have Value Type: Relation, which isn't a native type, but the allows us to define relation types as part of the schema. 
+
+| Name         | Type      | ID                     |
+| ------------ |-----------|----------------------- |
+| Relation     | Type      | 1dc83461-cb6c-4af7-bca1-84cb9554c84a |
+
+For each native value type, if a value is provided that is invalid, the triple should be dropped and treated as unset. Null cannot be provided as a value. Each native value type is UTF-8 encoded as a string.
 
 ### 8. Relations
 
@@ -156,13 +150,7 @@ Relations describe the edges of a graph. For example a Company can have Team Mem
 
 Relations are ordered. They can be reordered independently without conflicts using Fractional Indexing with an arbitrary level of precision between the indices of the items the user wants to move the item between. A fractional index must include randomness to allow items to be inserted between items with minimal chance of collision. This way moving the order of an item doesn't require changing the index of any of the other items.
 
-Relations must have Type: Relation
-
-| Name         | Type      | ID                     |
-| ------------ |-----------|----------------------- |
-| Relation     | Type      | 1dc83461-cb6c-4af7-bca1-84cb9554c84a |
-
-A relation is a native object type with a lightweight representation and a reference to an entity for adding additional :
+A relation is a native object type with a lightweight representation and a reference to an entity for adding additional properties.
 
 | Name          | Type | Description                                                                   |
 | ------------- |------| ----------------------------------------------------------------------------- |
@@ -171,14 +159,16 @@ A relation is a native object type with a lightweight representation and a refer
 | From entity   | ID   | The entity ID this relation is from                                             |
 | From property | ID   | An optional property ID for creating a relation from a specific property value  |
 | To entity     | ID   | The entity ID this relation is pointing to                                      |
+| To property   | ID   | The entity ID this relation is pointing to                                      |
 | To space      | ID   | An optional space ID to link to an entity specifically in a given space         |
+| Verified      | Checkbox | Whether or not the 'to space' is known by the source space to represent the 'to entity' |
 | Entity        | ID   | A new entity ID that can be used to add properties and types to the relation    |
 | Index         | Text | An alphanumeric fractional index describing the relative position of this item |
 
 
 ID, Type, From entity, To entity, and Entity are required. Linked entities don't have to be created before they're referenced by relations. A globally unique ID must be created for the Entity though no additional information has to be provided for the relation entity. This way there is already an ID available for adding data about the relation.
 
-The lightweight relation objects are immutable. They can only be created and deleted. The relation entity can be updated to add/remove properties or add/remove types.
+The From entity, To entity, Entity, and Type fields of the lightweight relations are immutable. To space, Verified, and Index can be updated. The relation entity can be updated to add/remove additional properties or add/remove additional types.
 
 #### 8.1 Relation Types
 
@@ -213,12 +203,11 @@ Every entity has an implicit Types relation and can have zero, one or many types
 | --------- |------|----------------------- |
 | Type      | Type | 00c3d9d2-78a9-4b92-9772-bbdc57a28614 |
 
-Types may have zero, one or many properties and relation types defined on them.
+Types may have zero, one or many properties and relation types defined on them. The Broader types are used to define a subtype hierarchy, with the subtypes pointing to their broader types. Subtypes inherit properties from their broader types.
 
 | Name           | Type                      | ID                     |
 | -------------- |---------------------------|----------------------- |
 | Properties     | Relation \<Property>      | a69ffb85-e3aa-4c1d-92c1-e33a2480ab80 |
-| Subtypes       | Relation \<Type>          | a34f8e52-52f8-44e5-89f2-0b22507f5b47 |
 | Broader types  | Relation \<Type>          | 14df474e-4f48-4117-9619-d99e4b3afd3e |
 
 
@@ -382,9 +371,11 @@ message Relation {
   bytes from_entity = 3;
   bytes from_property = 4;
   bytes to_entity = 5;
-  bytes to_space = 6;
-  bytes entity = 7;
-  string index = 8;
+  bytes to_property = 6;
+  bytes to_space = 7;
+  bytes entity = 8;
+  bool verified = 9;
+  string index = 10;
 }
 ```
 
@@ -403,8 +394,8 @@ enum OpType {
   UPDATE_ENTITY = 2;
   DELETE_ENTITY = 3;
   CREATE_RELATION = 4;
-  DELETE_RELATION = 5;
-  REORDER_RELATION = 6;
+  UPDATE_RELATION = 5;
+  DELETE_RELATION = 6;
   UNSET_PROPERTIES = 7;
   CREATE_PROPERTY = 8;
   ARCHIVE_PROPERTY = 9;
